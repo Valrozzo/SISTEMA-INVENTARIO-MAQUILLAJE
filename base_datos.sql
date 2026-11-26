@@ -1,0 +1,49 @@
+CREATE DATABASE IF NOT EXISTS sisim CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE sisim;
+
+CREATE TABLE IF NOT EXISTS usuarios (
+ id INT AUTO_INCREMENT PRIMARY KEY,
+ nombre VARCHAR(100) NOT NULL,
+ usuario VARCHAR(50) NOT NULL UNIQUE,
+ clave_hash VARCHAR(200) NOT NULL,
+ rol ENUM('ADMINISTRADOR','EMPLEADO') NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS proveedores (
+ id INT AUTO_INCREMENT PRIMARY KEY,
+ nombre VARCHAR(100) NOT NULL,
+ telefono VARCHAR(30)
+);
+
+CREATE TABLE IF NOT EXISTS productos (
+ id INT AUTO_INCREMENT PRIMARY KEY,
+ nombre VARCHAR(100) NOT NULL,
+ marca VARCHAR(100) NOT NULL,
+ precio DECIMAL(12,2) NOT NULL,
+ cantidad INT NOT NULL DEFAULT 0,
+ stock_minimo INT NOT NULL DEFAULT 3,
+ proveedor_id INT NULL,
+ CONSTRAINT fk_producto_proveedor FOREIGN KEY (proveedor_id) REFERENCES proveedores(id),
+ CONSTRAINT chk_precio CHECK (precio >= 0),
+ CONSTRAINT chk_cantidad CHECK (cantidad >= 0),
+ CONSTRAINT chk_minimo CHECK (stock_minimo >= 0)
+);
+
+CREATE TABLE IF NOT EXISTS ventas (
+ id INT AUTO_INCREMENT PRIMARY KEY,
+ fecha DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ usuario_id INT NOT NULL,
+ total DECIMAL(12,2) NOT NULL,
+ FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+);
+
+CREATE TABLE IF NOT EXISTS detalle_ventas (
+ id INT AUTO_INCREMENT PRIMARY KEY,
+ venta_id INT NOT NULL,
+ producto_id INT NOT NULL,
+ cantidad INT NOT NULL,
+ precio_unitario DECIMAL(12,2) NOT NULL,
+ subtotal DECIMAL(12,2) NOT NULL,
+ FOREIGN KEY (venta_id) REFERENCES ventas(id),
+ FOREIGN KEY (producto_id) REFERENCES productos(id)
+);

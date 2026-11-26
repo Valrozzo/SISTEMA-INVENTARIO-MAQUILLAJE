@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SISIM | Inventario de maquillaje</title><link rel="stylesheet" href="styles.css">
+<style>
+.auth-screen{min-height:100vh;display:grid;place-items:center;padding:24px;background:linear-gradient(135deg,#fbf7f9,#f7e8ef 55%,#f9e9dc)}
+.auth-screen.hidden{display:none}
+.auth-card{width:min(420px,100%);padding:36px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 18px 50px #30212b14}
+.auth-brand{font-size:15px;font-weight:800;letter-spacing:2px;color:var(--pink)}
+.auth-card h1{font-size:27px;margin:12px 0 6px}.auth-card>p{margin:0 0 24px;color:var(--muted);font-size:14px}
+.auth-form{display:grid;gap:15px}.auth-form label{display:grid;gap:7px;color:var(--ink);font-size:13px;font-weight:700}
+.auth-form.hidden{display:none}.auth-link{border:0;background:transparent;color:var(--pink);font:inherit;text-decoration:underline;cursor:pointer;padding:8px}
+.auth-form input,.auth-form select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:7px;font:inherit}
+.auth-form .primary{width:100%;margin-top:5px}.auth-message{min-height:18px;color:var(--red);font-size:13px}
+.userbox{display:flex;align-items:center;gap:12px}.user-identity{text-align:right}.logout-button{border:1px solid var(--line);background:#fff;color:var(--ink);padding:8px 11px;border-radius:6px;cursor:pointer}
+.expiry-heading{display:flex;align-items:baseline;gap:14px;margin:26px 0 12px}.expiry-heading h2{font-size:19px;margin:0}.expiry-heading span{color:var(--muted);font-size:13px}
+@media(max-width:600px){.auth-card{padding:26px}.userbox{gap:7px}.logout-button{padding:7px}.expiry-heading{align-items:flex-start;flex-direction:column;gap:5px}}
+</style>
+</head>
+<body>
+<section id="loginScreen" class="auth-screen"><div class="auth-card"><span class="auth-brand">SISIM</span><h1 id="authTitle">Iniciar sesión</h1><p id="authIntro">Ingresa con tu cuenta del sistema.</p>
+<form id="loginForm" class="auth-form"><label>Usuario<input name="usuario" required maxlength="50" autocomplete="username"></label><label>Contraseña<input name="clave" type="password" required autocomplete="current-password"></label><button class="primary" type="submit">Entrar</button><span id="loginMessage" class="auth-message" role="alert"></span></form>
+<button id="showRegisterButton" class="auth-link" type="button">Crear cuenta</button>
+<form id="registerForm" class="auth-form hidden"><label>Usuario<input name="usuario" required minlength="3" maxlength="50" autocomplete="username"></label><label>Tipo de cuenta<select name="rol" id="registerRole" required><option value="EMPLEADO">Personal de caja</option><option value="ADMINISTRADOR">Administrador</option></select></label><label>Contraseña<input name="clave" type="password" required minlength="8" maxlength="200" autocomplete="new-password"></label><label>Confirmar contraseña<input name="confirmar" type="password" required minlength="8" maxlength="200" autocomplete="new-password"></label><button class="primary" type="submit">Crear cuenta</button><button id="backToLoginButton" class="auth-link" type="button">Volver a iniciar sesión</button><span id="registerMessage" class="auth-message" role="alert"></span></form>
+</div></section>
+<div id="appShell" class="hidden">
+<header><div><span class="brand">SISIM</span><span class="subtitle">Sistema de Inventario para Tienda de Maquillaje</span></div><div class="userbox"><span id="userIdentity" class="user-identity"></span><button id="logoutButton" class="logout-button" type="button">Cerrar sesión</button></div></header>
+<div class="layout">
+<aside><h3>Menú principal</h3><button class="nav active" data-section="inicio">Inicio</button><button class="nav" data-section="productos" data-admin-only>Productos</button><button class="nav" data-section="inventario">Inventario</button><button class="nav" data-section="ventas">Registrar venta</button><button class="nav" data-section="proveedores" data-admin-only>Proveedores</button><button class="nav" data-section="usuarios" data-admin-only>Usuarios</button></aside>
+<main>
+<section id="inicio" class="section">
+<div class="welcome"><div><p class="eyebrow">CONTROL DEL NEGOCIO</p><h1>Inventario organizado,<br>negocio bajo control.</h1><p>Administra productos, existencias y ventas desde un solo lugar.</p></div><div class="makeup-icon" aria-hidden="true">✦</div></div>
+<div class="cards"><article><span>Productos registrados</span><strong id="countProducts">0</strong></article><article><span>Productos con bajo stock</span><strong id="countLow">0</strong></article><article><span>Unidades en inventario</span><strong id="countUnits">0</strong></article></div>
+<div class="panel"><h2>Acciones rápidas</h2><div class="quick"><button data-admin-only onclick="showSection('productos')">＋ Registrar producto</button><button onclick="showSection('inventario')">⌕ Consultar inventario</button><button onclick="showSection('ventas')">＋ Registrar venta</button></div></div>
+</section>
+<section id="productos" class="section hidden"><div class="heading"><div><p class="eyebrow">CATÁLOGO</p><h1>Registrar producto</h1><p>Agrega un producto al inventario de la tienda.</p></div></div>
+<form id="productForm" class="panel formgrid">
+<label>Nombre del producto<input name="nombre" required maxlength="100" placeholder="Ej. Labial mate"></label>
+<label>Marca<input name="marca" required maxlength="80" placeholder="Ej. Vogue"></label>
+<label>Precio (COP)<input name="precio" type="number" min="0" step="0.01" required></label>
+<label>Cantidad inicial<input name="cantidad" type="number" min="0" step="1" required value="0"></label>
+<label>Stock mínimo<input name="stock_minimo" type="number" min="0" step="1" value="5" required></label>
+<label>Fecha de vencimiento (opcional)<input name="fecha_vencimiento" type="date"></label>
+<div class="formactions"><button class="primary" type="submit">Guardar producto</button><span id="productMessage" class="message"></span></div>
+</form></section>
+<section id="inventario" class="section hidden"><div class="heading"><div><p class="eyebrow">EXISTENCIAS</p><h1>Inventario</h1><p>Consulta las cantidades y detecta productos con bajo stock.</p></div><button class="primary" onclick="loadProducts()">Actualizar</button></div>
+<div class="panel"><input id="search" class="search" placeholder="Buscar por nombre o marca..."><div class="tablewrap"><table><thead><tr><th>Producto</th><th>Marca</th><th>Precio</th><th>Unidades</th><th>Estado</th></tr></thead><tbody id="productRows"></tbody></table></div></div>
+<div class="expiry-heading"><h2>Vencimientos</h2><span>Productos vencidos o que vencen en los próximos 30 días</span></div>
+<div class="panel"><div class="tablewrap"><table><thead><tr><th>Producto</th><th>Marca</th><th>Fecha de vencimiento</th><th>Estado</th></tr></thead><tbody id="expiryRows"></tbody></table></div></div></section>
+<section id="ventas" class="section hidden"><div class="heading"><div><p class="eyebrow">OPERACIÓN</p><h1>Registrar venta</h1><p>Selecciona un producto y la cantidad vendida.</p></div></div>
+<form id="saleForm" class="panel formgrid"><label>Producto<select name="producto_id" id="saleProduct" required><option value="">Selecciona un producto</option></select></label><label>Cantidad a vender<input name="cantidad" type="number" min="1" step="1" required value="1"></label><div class="formactions"><button class="primary" type="submit">Registrar venta</button><span id="saleMessage" class="message"></span></div></form>
+<div class="note">El sistema verifica las existencias antes de registrar la venta y descuenta las unidades vendidas.</div></section>
+<section id="proveedores" class="section hidden"><div class="heading"><div><p class="eyebrow">ABASTECIMIENTO</p><h1>Proveedores</h1><p>Registra los datos de contacto de los proveedores. Ellos no ingresan al sistema.</p></div></div>
+<form id="providerForm" class="panel formgrid"><label>Nombre del proveedor<input name="nombre" required maxlength="100"></label><label>Teléfono<input name="telefono" maxlength="30"></label><label>Correo electrónico<input name="correo" type="email" maxlength="120"></label><div class="formactions"><button class="primary" type="submit">Guardar proveedor</button><span id="providerMessage" class="message"></span></div></form>
+<div class="panel"><h2>Proveedores registrados</h2><div class="tablewrap"><table><thead><tr><th>Nombre</th><th>Teléfono</th><th>Correo</th></tr></thead><tbody id="providerRows"></tbody></table></div></div></section>
+<section id="usuarios" class="section hidden"><div class="heading"><div><p class="eyebrow">ACCESO AL SISTEMA</p><h1>Registrar usuario</h1><p>Crea cuentas de administrador o personal de caja.</p></div></div>
+<form id="userForm" class="panel formgrid"><label>Nombre de usuario<input name="usuario" required minlength="3" maxlength="50" autocomplete="off"></label><label>Contraseña<input name="clave" type="password" required minlength="8" maxlength="200" autocomplete="new-password"></label><label>Rol<select name="rol" required><option value="EMPLEADO">Personal de caja</option><option value="ADMINISTRADOR">Administrador</option></select></label><div class="formactions"><button class="primary" type="submit">Crear usuario</button><span id="userMessage" class="message"></span></div></form></section>
+<footer>SISIM · Proyecto académico · Actores del sistema: Administrador y Empleado</footer>
+</main></div></div><script src="app.js"></script></body></html>
